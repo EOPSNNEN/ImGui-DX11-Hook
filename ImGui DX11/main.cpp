@@ -9,9 +9,8 @@ bool InitHook() {
     return true;
 }
 
-
 void Run() {
-    if (InitHook()) { LOG("Initialize success"); }
+    if (InitHook()) { LOG("Init success"); }
     Renderer::Hook((void**)&oPresent, Backend::HookPresent);
 }
 
