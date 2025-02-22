@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="base\console.cpp" />
     <ClCompile Include="base\draw.cpp" />
-    <ClCompile Include="base\vec2.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
