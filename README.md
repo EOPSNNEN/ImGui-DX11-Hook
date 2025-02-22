@@ -6,7 +6,7 @@
 <summary>EN</summary>
   
 ### ImGui DX11 Hook template
-This repo provides basic functionality in order to write own game stuffs etc.
+This repo provides basic functionality in order to write own stuffs.
 
 </details>
 
