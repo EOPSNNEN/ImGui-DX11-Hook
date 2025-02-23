@@ -17,32 +17,31 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-
 bool init = false;
 HRESULT __stdcall Backend::HookPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
     if (!init) {
-        if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&pDevice))) {
+
+        HRESULT getDeviceResult = pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&pDevice);
+        if (SUCCEEDED(getDeviceResult)) {
             pDevice->GetImmediateContext(&pContext);
+
             DXGI_SWAP_CHAIN_DESC sd;
             pSwapChain->GetDesc(&sd);
             window = sd.OutputWindow;
 
             ID3D11Texture2D* pBackBuffer;
-            pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-            pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &mainRenderTargetView);
-            pBackBuffer->Release();
+            if (pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<LPVOID*>(&pBackBuffer))) {
+                pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &mainRenderTargetView);
+                pBackBuffer->Release();
+            }
             oWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)WndProc);
 
             Renderer::Init(pDevice, pContext, window);
             init = true;
         }
-        else {
-            return oPresent(pSwapChain, SyncInterval, Flags);
-        }
     }
 
     Renderer::Render();
-
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
@@ -85,20 +84,18 @@ bool Backend::FindPresent() {
         return false;
     }
 
-    const DWORD_PTR* pSwapChainVtable = reinterpret_cast<DWORD_PTR*>(pSwapChain);
-    pSwapChainVtable = reinterpret_cast<DWORD_PTR*>(pSwapChainVtable[0]);
-    fnIDXGISwapChainPresent = reinterpret_cast<IDXGISwapChainPresent>(pSwapChainVtable[8]);
+    void** vTable = *reinterpret_cast<void***>(pSwapChain);
+    fnIDXGISwapChainPresent = reinterpret_cast<IDXGISwapChainPresent>(vTable[8]);
 
     pSwapChain->Release();
     pDevice->Release();
     pContext->Release();
 
     DestroyWindow(swapChainDesc.OutputWindow);
-    UnregisterClass(wc.lpszClassName, wc.hInstance);
+    UnregisterClass(wc.lpszClassName, GetModuleHandle(nullptr));
 
     return true;
 }
-
 
 bool Backend::AttachPresent(void** original, void* function) {
     if (!fnIDXGISwapChainPresent) return false;
@@ -110,7 +107,6 @@ bool Backend::AttachPresent(void** original, void* function) {
 
     return true;
 }
-
 
 bool Backend::DetachPresent() {
     if (MH_DisableHook(reinterpret_cast<void*>(fnIDXGISwapChainPresent)) != MH_OK ||
