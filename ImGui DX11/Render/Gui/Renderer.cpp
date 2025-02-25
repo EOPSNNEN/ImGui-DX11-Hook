@@ -12,9 +12,6 @@ void Renderer::Init(ID3D11Device* device, ID3D11DeviceContext* context, HWND hwn
     ImGui_ImplDX11_Init(pDevice, pContext);
 
     ImGui::GetIO().Fonts->AddFontDefault();
-    ImFontConfig font_cfg;
-    font_cfg.GlyphExtraSpacing.x = 1.2;
-    font::gameFont = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(font::TTSquaresCondensedBold, 14, 14, &font_cfg);
 }
 
 void Renderer::Render() {
@@ -45,7 +42,6 @@ void Renderer::Shutdown() {
 
     if (mainRenderTargetView) {
         mainRenderTargetView->Release();
-        mainRenderTargetView = nullptr;
     }
 }
 
