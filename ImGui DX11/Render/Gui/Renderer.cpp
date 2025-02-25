@@ -10,12 +10,13 @@ void Renderer::Init(ID3D11Device* device, ID3D11DeviceContext* context, HWND hwn
     ImGui::CreateContext();
     ImGui_ImplWin32_Init(window);
     ImGui_ImplDX11_Init(pDevice, pContext);
-
+    
     ImGui::GetIO().Fonts->AddFontDefault();
+
+    ImGui_ImplDX11_NewFrame();
 }
 
 void Renderer::Render() {
-    ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
@@ -48,6 +49,5 @@ void Renderer::Shutdown() {
 void Renderer::ToggleMenu() {
     if (GetAsyncKeyState(VK_INSERT) & 1) {
         show_menu = !show_menu;
-        ImGui::GetIO().MouseDrawCursor = show_menu;
     }
 }

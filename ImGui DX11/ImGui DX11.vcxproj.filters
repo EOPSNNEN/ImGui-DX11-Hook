@@ -71,9 +71,6 @@
     <ClInclude Include="base\draw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="base\font.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="base\includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
